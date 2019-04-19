@@ -15,7 +15,7 @@ struct dataDecode {
   int _screen;
   String _timee = "";
   String _battery = "";
-  String _songs[5] = {};
+  String _songs[10] = {"","","","","","","","","",""};
   String _currentlyPlaying = "YEAH";
   String _duration = "2:32";
   String _isPlaying = "paused";
@@ -61,19 +61,20 @@ void listFace(struct dataDecode dac){
   display.setCursor(0, 0);
   display.drawLine(0, 12, display.width(), 12, WHITE);
   display.setCursor(3,18);
-  display.print(dac._songs[0]);
+  display.print(dac._songs[dac._cursorPosition + 0]);
   display.setCursor(3,32);
-  display.print(dac._songs[1]);
+  display.print(dac._songs[dac._cursorPosition + 1]);
   display.setCursor(3,45);
-  display.print(dac._songs[2]);
-  switch(dac._cursorPosition){
-    case 0:display.drawRoundRect(0,15, 128, 15, 0, WHITE);
-            break;
-    case 1:display.drawRoundRect(0,29, 128, 15, 0, WHITE);
-            break;
-    case 2:display.drawRoundRect(0,42, 128, 15, 0, WHITE);
-            break;
-  }
+  display.print(dac._songs[dac._cursorPosition + 2]);
+  display.drawRoundRect(0,15, 128, 15, 0, WHITE);
+//  switch(dac._cursorPosition%3){
+//    case 0:display.drawRoundRect(0,15, 128, 15, 0, WHITE);
+//            break;
+//    case 1:display.drawRoundRect(0,29, 128, 15, 0, WHITE);
+//            break;
+//    case 2:display.drawRoundRect(0,42, 128, 15, 0, WHITE);
+//            break;
+//  }
   display.display(); // Update screen with each newly-drawn line
   delay(1);
 }
@@ -112,7 +113,7 @@ void playerFace(struct dataDecode dac){
 dac_type stringToStrct(String s){
     dac_type dac;
     String readStringFromUART = s;
-    //String readStringFromUART = "screen:1;time:2:15;battery:42;s1,s2,s3,s4,s5;currentlyplaying:s2;duration:4:15;playing:paused;cursorpos:2;"; //s;
+    //String readStringFromUART = "screen:1;time:2:15;battery:42;s1,s2,s3,s4,s5;currentlyplaying:s2;duration:4:15;playing:paused;cursorpos:1;"; //s;
     //Serial.println(readStringFromUART);
     
     int ind1 = readStringFromUART.indexOf(';');  //finds location of first ,
@@ -192,20 +193,46 @@ void loop() {
   dac_type d;
   //#if ENABLE_READUART
   if(Serial.available()>0) {
-  Serial.flush();  
-  String s = Serial.readStringUntil('#');
-  Serial.println(s);
+    Serial.flush();  
+    //String s ="screen:1;time:2:15;battery:42;a.wav,b.wav,c.wav,d.wav,e.wav;currentlyplaying:s2;duration:4:15;playing:paused;cursorpos:3;";
+    String s = Serial.readStringUntil('#');
+    //Serial.println(s);
   
-  d = stringToStrct(s);
+    d = stringToStrct(s);
+    Serial.print("Screen : ");
+    Serial.print(d._screen);
+    Serial.print(" Time : ");
+    Serial.print(d._timee);
+    Serial.print(" Battery : ");
+    Serial.print(d._battery);
+    Serial.print(" Song 0 : ");
+    Serial.print(d._songs[0]);
+    Serial.print(" Song 1 : ");
+    Serial.print(d._songs[1]);
+    Serial.print(" Song 2 : ");
+    Serial.print(d._songs[2]);
+    Serial.print(" Song 3 : ");
+    Serial.print(d._songs[3]);
+    Serial.print(" Song 4 : ");
+    Serial.print(d._songs[4]);
+    Serial.print(" Currently Playing : ");
+    Serial.print(d._currentlyPlaying);
+    Serial.print(" Duration : ");
+    Serial.print(d._duration);
+    Serial.print(" Is playing : ");
+    Serial.print(d._isPlaying);
+    Serial.print(" cursor Pos : ");
+    Serial.println(d._cursorPosition);
+  
 //  if(flag){
-if(!d._screen)
-    playerFace(d);
+    if(!d._screen)
+      playerFace(d);
     //delay(2000);
 //    flag = false;
 //    select = -1;
 //  }
-  else 
-    listFace(d);
+    else 
+      listFace(d);
 //  }
 //  
 //  delay(1000);
@@ -216,6 +243,8 @@ if(!d._screen)
 //    flag = true;
 //  }
 //}
-Serial.flush();
+
+  Serial.flush();
 //delay(500);
-  }}
+  }
+ }
